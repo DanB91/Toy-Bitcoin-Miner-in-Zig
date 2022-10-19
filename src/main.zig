@@ -109,8 +109,6 @@ pub fn main() !void {
             mining_states.buffer[i] = MiningState{
                 .nonce = nonce_start,
                 .nonce_limit = nonce_start + increment,
-                //.nonce = 376476892-50000,
-                //.nonce_limit = 0xFFFF_FFFF,
                 .num_hashes = 0,
                 .total_time_ms = 0,
                 .max_time_ms = 0,
@@ -159,14 +157,11 @@ fn ms_to_sec(ms: i64) f64 {
 
 fn bits_to_target(bits: []const u8) [32]u8 {
     var ret: [32]u8 = undefined;
-    //TODO try with lower values than 9.  ideally should be 4
-    //TODO write stack allocator "alloca"
     var target_limb_buffer: [66]usize = undefined;
 
     const coefficient = @as(u32, bits[0]) + (@as(u32, bits[1]) << 8) +
         (@as(u32, bits[2]) << 16);
 
-    //TODO write stack allocator "alloca"
     var scratch_limbs: [66]usize = undefined;
 
     var base_limb_buffer: [1]usize = undefined;
@@ -211,7 +206,6 @@ fn did_we_mine_a_block(nonce: u32, target: [32]u8) bool {
 
     comptime var i = @as(comptime_int, target.len) - 1;
     inline while (i >= 0) : (i -= 1) {
-        //print_to_serial("comparing hash byte {x} to target byte {x} at index {}, nonce: {x}", .{hash_result[i], target[i], i, nonce});
         if (hash_result[i] < target[i]) {
             //BIG MONEY!!!
             return true;
