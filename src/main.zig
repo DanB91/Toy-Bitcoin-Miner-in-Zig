@@ -86,7 +86,13 @@ fn mining_thread(mining_state: *MiningState) void {
     }
     return;
 }
-var mining_states: struct { buffer: [32]MiningState, states: []MiningState } = .{ .buffer = undefined, .states = &[0]MiningState{} };
+var mining_states: struct {
+    buffer: [32]MiningState,
+    states: []MiningState,
+} = .{
+    .buffer = undefined,
+    .states = &[0]MiningState{},
+};
 var g_is_running = true;
 var g_start_ms: i64 = 0;
 
@@ -189,12 +195,6 @@ fn bits_to_target(bits: []const u8) [32]u8 {
     return ret;
 }
 
-//NOTE: this code is a result of the NOTE below in update()
-//var last_nonce: u32 = 0;
-//var last_tmp_result: [32]u8 = undefined;
-//var last_hash_result: [32]u8 = undefined;
-//var last_block: [80]u8 = undefined;
-
 fn did_we_mine_a_block(nonce: u32, target: [32]u8) bool {
     var block_header = current_block;
     {
@@ -206,32 +206,8 @@ fn did_we_mine_a_block(nonce: u32, target: [32]u8) bool {
     var hash_result: [32]u8 = undefined;
     var tmp_result: [32]u8 = undefined;
 
-    //print_to_serial("blockheader: {x}, for nonce: {x}", .{block_header, nonce});
     Sha256.hash(&block_header, &tmp_result, .{});
     Sha256.hash(&tmp_result, &hash_result, .{});
-
-    //NOTE: this code is a result of the NOTE below in update()
-    //print_to_serial("tmp result: {x}, hash result {x}, for nonce: {x}", .{tmp_result, hash_result, nonce});
-    //if (last_nonce == nonce) {
-    //if (!std.mem.eql(u8, &last_block, &block_header)) {
-    //print_to_serial("last block {x}, new block: {x}", .{last_block, block_header});
-    //@panic("block is wrong!");
-    //}
-    //if (!std.mem.eql(u8, &last_tmp_result, &tmp_result)) {
-    //print_to_serial("last block {x}, new block: {x}", .{last_block, block_header});
-    //print_to_serial("last tmp result {x}, new tmp result: {x}", .{last_tmp_result, tmp_result});
-    //@panic("Tmp result is wrong!");
-    //}
-    //if (!std.mem.eql(u8, &last_hash_result, &hash_result)) {
-    //print_to_serial("last tmp result {x}, new tmp result: {x}", .{last_tmp_result, tmp_result});
-    //print_to_serial("last hash result {x}, new hash result: {x}", .{last_hash_result, hash_result});
-    //@panic("hash result is wrong!");
-    //}
-    //}
-    //last_block = block_header;
-    //last_nonce = nonce;
-    //last_tmp_result = tmp_result;
-    //last_hash_result = hash_result;
 
     comptime var i = @as(comptime_int, target.len) - 1;
     inline while (i >= 0) : (i -= 1) {
